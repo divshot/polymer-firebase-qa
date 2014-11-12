@@ -1,0 +1,54 @@
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+<link rel="import" href="/bower_components/paper-input/paper-autogrow-textarea.html">
+
+<polymer-element name="qa-answer-form" attributes="questionId">
+  <template>
+    <style>
+      :host {
+        display: block;
+        border-top: 1px solid #f5f5f5;
+        padding: 40px;
+      }
+
+      paper-autogrow-textarea {
+        display: block;
+        margin: 0 0 10px;
+      }
+
+      paper-autogrow-textarea textarea {
+        font-size: 14px;
+      }
+    </style>
+    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions/{{questionId}}/answers" data="{{answers}}"></firebase-element>
+    <pvc-globals values="{{globals}}"></pvc-globals>
+
+    <paper-autogrow-textarea id="answerArea">
+      <textarea id="answer" placeholder="Type your answer here..."></textarea>
+    </paper-autogrow-textarea>
+
+    <button on-click="{{submit}}">Submit Answer</button>
+  </template>
+  <script>
+    Polymer({
+      submit: function() {
+        if (this.$.answer.value.length) {
+          var answer = this.$.base.push({
+            content: this.$.answer.value,
+            user: {
+              uid: this.globals.currentUser.uid,
+              username: this.globals.currentUser.github.username,
+              avatar_url: this.globals.currentUser.github.cachedUserProfile.avatar_url,
+              html_url: this.globals.currentUser.github.cachedUserProfile.html_url
+            },
+            timestamp: new Date().getTime()
+          });
+
+          this.$.answer.value = '';
+        } else {
+          console.error('Please write an answer.');
+        }
+      }
+    });
+  </script>
+</polymer-element>

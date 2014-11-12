@@ -1,0 +1,104 @@
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+<link rel="import" href="/elements/questions/answer.html">
+<link rel="import" href="/elements/questions/answer-form.html">
+
+<polymer-element name="qa-view">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .question {
+        padding: 40px 20px;
+        border-bottom: 1px solid #f5f5f5;
+      }
+
+      .author {
+        width: 120px;
+        padding: 8px 40px 0 0;
+        text-align: center;
+      }
+
+      .author a {
+        color: #333;
+        text-decoration: none;
+      }
+
+      .avatar {
+        display: block;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      .content {
+        color: #616161;
+        margin: 0 0 20px;
+      }
+    </style>
+    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions/{{id}}" data="{{question}}"></firebase-element>
+    <pvc-globals values="{{globals}}"></pvc-globals>
+
+    <paper-shadow z="1">
+      <div class="question" layout horizontal>
+        <div class="author">
+          <a href="{{question.user.html_url}}" target="_blank">
+            <img class="avatar" src="{{question.user.avatar_url}}" width="40">
+            <span class="username">{{question.user.username}}</span>
+          </a>
+          <qa-like questionId="{{id}}" type="question"></qa-like>
+        </div>
+        <div flex>
+          <h1 id="questionTitle" contenteditable?="{{editMode}}">{{question.title}}</h1>
+          <div id="questionContent" class="content" contenteditable?="{{editMode}}">
+            {{question.content}}
+          </div>
+          <div hidden?="{{!editMode}}">
+            <button on-click="{{saveQuestion}}">Save Question</button> or <a on-click="{{cancelEditing}}">Cancel</a>
+          </div>
+          <button on-click="{{editQuestion}}" hidden?="{{question.user.username != globals.currentUser.github.username}}">Edit Question</button>
+          <button on-click="{{deleteQuestion}}" hidden?="{{question.user.username != globals.currentUser.github.username}}">Delete Question</button>
+        </div>
+      </div>
+    </paper-shadow>
+
+    <template repeat="{{key in keys(question.answers)}}">
+      <qa-answer id="{{key}}" questionId="{{id}}"></qa-answer>
+    </template>
+
+    <div hidden?="{{!globals.currentUser}}">
+      <qa-answer-form questionId="{{id}}"></qa-answer-form>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      editMode: false,
+      keys: function(input) {
+        if (input) return Object.keys(input);
+      },
+      editQuestion: function() {
+        this.editMode = true;
+      },
+      cancelEditing: function() {
+        this.editMode = false;
+      },
+      saveQuestion: function() {
+        this.question.title = this.$.questionTitle.innerText;
+        this.question.content = this.$.questionContent.innerHTML;
+        this.editMode = false;
+      },
+      deleteQuestion: function() {
+        var confirmDeletion = confirm('Are you sure you want to delete this question?');
+        if (confirmDeletion) {
+          document.location.href = '/#/questions';
+          this.$.base.remove('/');
+        }
+      }
+    });
+  </script>
+</polymer-element>

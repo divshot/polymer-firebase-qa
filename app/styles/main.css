@@ -1,0 +1,13 @@
+body {
+  background: #fafafa;
+  font-family: RobotoDraft, "Helvetica Neue", Helvetica, Arial;
+  color: #333;
+}
+
+html /deep/ paper-action-dialog paper-input {
+  width: 100%;
+}
+
+html /deep/ paper-action-dialog paper-autogrow-textarea textarea {
+  font-size: 14px;
+}

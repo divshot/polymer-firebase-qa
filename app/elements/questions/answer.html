@@ -1,0 +1,81 @@
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+
+<polymer-element name="qa-answer" attributes="id questionId">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .answer {
+        padding: 40px 20px;
+      }
+
+      .author {
+        width: 120px;
+        font-size: 12px;
+        padding: 8px 40px 0 0;
+        text-align: center;
+      }
+
+      .author a {
+        color: #333;
+        text-decoration: none;
+      }
+
+      .avatar {
+        display: block;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+      }
+
+      .content {
+        color: #616161;
+        margin: 0 0 20px;
+      }
+    </style>
+    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions/{{questionId}}/answers/{{id}}" data="{{answer}}"></firebase-element>
+    <pvc-globals values="{{globals}}"></pvc-globals>
+
+    <div class="answer" layout horizontal>
+      <div class="author">
+        <a href="{{answer.user.html_url}}" target="_blank">
+          <img class="avatar" src="{{answer.user.avatar_url}}" width="32">
+          <span class="username">{{answer.user.username}}</span>
+        </a> 
+      </div>
+      <div flex>
+        <p id="answerContent" class="content" contenteditable?="{{editMode}}">{{answer.content}}</p>
+
+        <div hidden?="{{!editMode}}">
+          <button on-click="{{save}}">Save Answer</button> or <a on-click="{{cancel}}">Cancel</a>
+        </div>
+
+        <button on-click="{{edit}}" hidden?="{{answer.user.username != globals.currentUser.github.username}}">Edit Answer</button>
+        <button on-click="{{delete}}" hidden?="{{answer.user.username != globals.currentUser.github.username}}">Delete Answer</button>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      editMode: false,
+      edit: function() {
+        this.editMode = true;
+      },
+      cancel: function() {
+        this.editMode = false;
+      },
+      save: function() {
+        this.answer.content = this.$.answerContent.innerHTML;
+        this.editMode = false;
+      },
+      delete: function() {
+        var confirmDeletion = confirm('Are you sure you want to delete this answer?');
+        if (confirmDeletion) {
+          this.$.base.remove('/');
+        }
+      }
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,104 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" href="/bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="/bower_components/core-icons/social-icons.html">
+<link rel="import" href="/bower_components/core-menu/core-menu.html">
+<link rel="import" href="/bower_components/paper-dropdown/paper-dropdown.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="/bower_components/paper-item/paper-item.html">
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/firebase-element/firebase-login.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+<link rel="import" href="/bower_components/app-router/app-router.html">
+
+<polymer-element name="qa-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+      }
+
+      core-header-panel {
+        height: 100%;
+      }
+
+      core-header-panel::shadow #mainContainer {
+        background: #f5f5f5;
+      }
+
+      core-toolbar {
+        background: none;
+      }
+
+      .core-header {
+        height: 60px;
+        line-height: 60px;
+        font-size: 18px;
+        padding: 0 10px;
+        background-color: #3F51B5;
+        color: #fff;
+        transition: height 0.2s;
+      }
+
+      .core-header paper-item {
+        color: #333;
+      }
+
+      .core-header paper-menu-button {
+        height: 40px;
+      }
+
+      .content {
+        background: #fff;
+      }
+    </style>
+    <firebase-login id="baseLogin" user="{{user}}" statusKnown="{{statusKnown}}" location="https://YOUR-FIREBASE.firebaseio.com" provider="github" on-login="{{onLogin}}" on-error="{{onLoginError}}"></firebase-login>
+    <pvc-globals values="{{globals}}"></pvc-globals>
+    <core-header-panel>
+      <div class="core-header">
+        <core-toolbar>
+          <div flex>Firebase Q&amp;A</div>
+          <paper-menu-button halign="right">
+            <paper-icon-button icon="social:person"></paper-icon-button>
+            <paper-dropdown class="dropdown" transition="">
+              <core-menu class="menu">
+                <paper-item on-click="{{login}}" hidden?="{{!statusKnown || user}}">Login</paper-item>
+                <paper-item on-click="{{logout}}" hidden?="{{!statusKnown || !user}}">Logout</paper-item>
+              </core-menu>
+            </paper-dropdown>
+          </paper-menu-button>
+          <template if="{{user}}">{{user.github.username}}</template>
+        </core-toolbar>
+      </div>
+      <div class="content">
+        <app-router>
+          <app-route path="/questions" import="/elements/questions/list.html" element="qa-list"></app-route>
+          <app-route path="/questions/:id" import="/elements/questions/view.html" element="qa-view"></app-route>
+        </app-router>
+      </div>
+    </core-header-panel>
+  </template>
+  <script>
+  (function () {
+    'use strict';
+
+    Polymer({
+      login: function() {
+        this.$.baseLogin.login();
+      },
+      logout: function() {
+        this.$.baseLogin.logout();
+      },
+      onLogin: function() {
+        this.globals.currentUser = this.user;
+      },
+      onLoginError: function(err) {
+        console.log('An error occurred.');
+      }
+    });
+
+  })();
+  </script>
+</polymer-element>

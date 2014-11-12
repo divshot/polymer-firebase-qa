@@ -1,0 +1,146 @@
+<link rel="import" href="/bower_components/firebase-element/firebase-element.html">
+<link rel="import" href="/bower_components/pvc-globals/pvc-globals.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-action-dialog.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input.html">
+<link rel="import" href="/bower_components/paper-input/paper-autogrow-textarea.html">
+
+<polymer-element name="qa-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .question {
+        padding: 20px;
+        background: #fff;
+      }
+
+      .question h3 {
+        margin: 0;
+      }
+
+      .question h3 a {
+        color: #333;
+        text-decoration: none;
+      }
+
+      .question h3 a:hover {
+        color: #3F51B5;
+      }
+
+      .question .user {
+        padding-right: 20px;
+      }
+
+      .question .user img {
+        border-radius: 50%;
+      }
+
+      .question .details {
+
+      }
+
+      .question .details p {
+        color: #616161;
+        margin: 8px 0;
+      }
+
+      .question .metadata {
+        font-size: 12px;
+        color: #BDBDBD;
+      }
+
+      .question .metadata a {
+        color: #616161;
+        border-bottom: 1px solid #eee;
+        text-decoration: none;
+      }
+
+      .ask-question {
+        padding: 20px;
+        text-align: center;
+      }
+    </style>
+    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions" data="{{questions}}" keys="{{keys}}"></firebase-element>
+    <pvc-globals values="{{globals}}"></pvc-globals>
+    <template repeat="{{id in keys}}">
+      <paper-shadow z="1">
+        <div class="question">
+          <div layout horizontal center>
+            <div class="user">
+              <img width="40" src="{{questions[id]['user']['avatar_url']}}">
+            </div>
+            <div class="details" flex>
+              <h3><a href="/#/questions/{{id}}">{{questions[id]['title']}}</a></h3>
+              <p>{{questions[id]['content']}}</p>
+              <span class="metadata">by <a href="{{questions[id]['user']['html_url']}}">{{questions[id]['user']['username']}}</a> &bull; {{questions[id]['timestamp']}}</span>
+            </div>
+            <div class="view">
+              <paper-icon-button on-click="{{viewQuestion}}" question-id="{{id}}" icon="arrow-forward" title="View Question"></paper-icon-button>
+            </div>
+          </div>
+        </div>
+      </paper-shadow>
+    </template>
+    <div class="ask-question">
+      Got a question?
+      <button on-click="{{openDialog}}">
+        Ask It
+
+        <paper-action-dialog id="questionDialog" heading="Ask Question" transition="core-transition-bottom">
+          <form>
+            <paper-input id="title" label="Title"></paper-input>
+            <paper-autogrow-textarea id="contentArea">
+              <textarea id="content" placeholder="Type your question here..."></textarea>
+            </paper-autogrow-textarea>
+          </form>
+          <paper-button affirmative autofocus on-click="{{submitQuestion}}">Ask</paper-button>
+        </paper-action-dialog>
+      </button>
+    </div>
+  </template>
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        openDialog: function() {
+          this.$.questionDialog.toggle();
+        },
+        submitQuestion: function() {
+          if (!this.$.title.value.length) {
+            alert('Please write a title.');
+            return;
+          }
+
+          if (!this.$.content.value.length) {
+            alert('Please write a question.');
+            return;
+          }
+
+          var question = this.$.base.push({
+            title: this.$.title.value,
+            content: this.$.content.value,
+            user: {
+              uid: this.globals.currentUser.uid,
+              username: this.globals.currentUser.github.username,
+              avatar_url: this.globals.currentUser.github.cachedUserProfile.avatar_url,
+              html_url: this.globals.currentUser.github.cachedUserProfile.html_url
+            },
+            timestamp: new Date().getTime()
+          });
+
+          this.$.title.value = '';
+          this.$.content.value = '';
+        },
+        viewQuestion: function(e) {
+          var id = e.target.getAttribute('question-id');
+          document.location.href = '/#/questions/' + id;
+        }
+      });
+
+    })();
+  </script>
+</polymer-element>
