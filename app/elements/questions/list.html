@@ -63,7 +63,7 @@
         text-align: center;
       }
     </style>
-    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions" data="{{questions}}" keys="{{keys}}"></firebase-element>
+    <firebase-element id="base" location="https://{{globals.firebase}}.firebaseio.com/questions" data="{{questions}}" keys="{{keys}}"></firebase-element>
     <pvc-globals values="{{globals}}"></pvc-globals>
     <template repeat="{{id in keys}}">
       <paper-shadow z="1">

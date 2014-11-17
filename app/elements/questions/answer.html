@@ -35,7 +35,7 @@
         margin: 0 0 20px;
       }
     </style>
-    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions/{{questionId}}/answers/{{id}}" data="{{answer}}"></firebase-element>
+    <firebase-element id="base" location="https://{{globals.firebase}}.firebaseio.com/questions/{{questionId}}/answers/{{id}}" data="{{answer}}"></firebase-element>
     <pvc-globals values="{{globals}}"></pvc-globals>
 
     <div class="answer" layout horizontal>

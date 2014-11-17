@@ -54,7 +54,7 @@
         background: #fff;
       }
     </style>
-    <firebase-login id="baseLogin" user="{{user}}" statusKnown="{{statusKnown}}" location="https://YOUR-FIREBASE.firebaseio.com" provider="github" on-login="{{onLogin}}" on-error="{{onLoginError}}"></firebase-login>
+    <firebase-login id="baseLogin" user="{{user}}" statusKnown="{{statusKnown}}" location="https://{{globals.firebase}}.firebaseio.com" provider="github" on-login="{{onLogin}}" on-error="{{onLoginError}}"></firebase-login>
     <pvc-globals values="{{globals}}"></pvc-globals>
     <core-header-panel>
       <div class="core-header">
@@ -85,6 +85,9 @@
     'use strict';
 
     Polymer({
+      ready: function() {
+        this.globals.firebase = '<your-firebase>';
+      },
       login: function() {
         this.$.baseLogin.login();
       },

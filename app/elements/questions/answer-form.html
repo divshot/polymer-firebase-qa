@@ -20,7 +20,7 @@
         font-size: 14px;
       }
     </style>
-    <firebase-element id="base" location="https://YOUR-FIREBASE.firebaseio.com/questions/{{questionId}}/answers" data="{{answers}}"></firebase-element>
+    <firebase-element id="base" location="https://{{globals.firebase}}.firebaseio.com/questions/{{questionId}}/answers" data="{{answers}}"></firebase-element>
     <pvc-globals values="{{globals}}"></pvc-globals>
 
     <paper-autogrow-textarea id="answerArea">
